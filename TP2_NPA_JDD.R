@@ -26,3 +26,15 @@ newNames<-c('reason', 'age', 'sex', 'height', 'weight',
                       'sodium', 'potassium', 'total_serum_bilirubin', 'lactate', 'inr',
                       'd_dimer', 'crp')
 colnames(df)<-newNames
+
+#Note that many values are "", which aren't counted as NA.
+df %>% group_by(smoke_hist) %>%
+  count()
+
+#Fixing using mutate and na_if.
+#Goes through all columns in df, checks if its a character
+#column, and if it is, maps it through na_if, which replaces
+#each "" value with NA.
+df<-df %>%
+  mutate(across(where(is.character),~na_if(.,"")))
+
