@@ -84,4 +84,17 @@ df %>% group_by(reason) %>%
   count()
 
 #Alright, now reason is fixed.
-#Now onto comorb.
+#Now going to quickly fix motor, verbal, and eye before I fix comorb.
+
+df$motor<-as.character(df$motor)
+df$eye<-as.character(df$eye)
+df$verbal<-as.character(df$verbal)
+
+#Fixed those, now onto comorb.
+fixcomorb<-function(x){
+  ifelse(grepl("Asthma",x,fixed=TRUE),
+         ifelse("ypertension",x,fixed=TRUE),
+         )
+  
+  
+}
