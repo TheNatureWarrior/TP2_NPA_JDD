@@ -38,3 +38,50 @@ df %>% group_by(smoke_hist) %>%
 df<-df %>%
   mutate(across(where(is.character),~na_if(.,"")))
 
+#To also clean out nulls in comorb
+df<-df %>%
+  mutate(across(where(is.character),~na_if(.,"[]")))
+
+df %>% group_by(comorb) %>%
+  count()
+
+#Now to fix up comorb and reason some
+#Testing some functions I may use to make clean function
+grepl("helpmeout","why dont you help me out", fixed=TRUE)
+grepl("hel","why odnt you help me out", fixed=TRUE)
+grepl("apple", "happlessness",fixed=TRUE)
+
+streamreason<- function(x){
+  ifelse(grepl("[J80]",x,fixed=TRUE),"ARDS",
+         ifelse(grepl("[J18.9]",x,fixed=TRUE),"Pneumonia",
+                ifelse(grepl("[U07.1]",x,fixed=TRUE),"COVID-19",
+                ifelse(grepl("[U07.2]",x,fixed=TRUE),"Probable COVID-19",
+                ifelse(grepl("[B34.2]",x,fixed=TRUE),"Coronavirus infection",
+                ifelse(grepl("[R05]",x,fixed=TRUE),"Cough",
+                ifelse(grepl("[J98.9, R50.9]",x,fixed=TRUE),"Febrile respiratory illness",
+                ifelse(grepl("[R50.9]",x,fixed=TRUE),"Fever",
+                ifelse(grepl("[R09.0]",x,fixed=TRUE),"Hypoxemia",                                                   
+                ifelse(grepl("[M79.19]",x,fixed=TRUE),"Myalgia",
+                ifelse(grepl("[U07.1, J12.8]",x,fixed=TRUE),"Pneumonia due to COVID-19",
+                ifelse(grepl("[R06.0]",x,fixed=TRUE),"Shortness of breath",
+                ifelse(grepl("[R06.0, U07.2]",x,fixed=TRUE),"Shortness of breath with exposure to COVID-19",
+                ifelse(grepl("[R06.8]",x,fixed=TRUE),"Tachypnea",
+                ifelse(grepl("[J12.9]",x,fixed=TRUE),"Viral pneumonia",
+                ifelse(grepl("[J96.99]",x,fixed=TRUE),"Respiratory failure",
+                       ifelse(grepl("[J98.8]",x,fixed=TRUE),"Respiratory tract infection", x)
+                                                                                             
+                                     ))))))))))))))))
+}
+
+#Applying function across dataframe, will only effect reason
+#but might as well apply across all
+
+df<-df %>%
+  mutate(across(where(is.character),~(streamreason(.))))
+
+
+df %>% group_by(reason) %>%
+  count()
+
+#Alright, now reason is fixed.
+#Now onto comorb.
