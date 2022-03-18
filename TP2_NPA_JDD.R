@@ -45,7 +45,7 @@ df<-df %>%
 df %>% group_by(comorb) %>%
   count()
 
-#Now to fix up comorb and reason some
+#Now to fix up the rest (reason, comorb, motor, verbal, eye)
 #Testing some functions I may use to make clean function
 grepl("helpmeout","why dont you help me out", fixed=TRUE)
 grepl("hel","why odnt you help me out", fixed=TRUE)
@@ -91,10 +91,68 @@ df$eye<-as.character(df$eye)
 df$verbal<-as.character(df$verbal)
 
 #Fixed those, now onto comorb.
+#In initial project, had several different functions to get comorb to end result.
+#End result only included Asthma, Chronic cardiac disease, chronic pulmonary disease, and diabetes.
+#If the entry had either Hypertension or Chronic cardiac diease (not hypertension), it was counted as chronic cardiac disease.
+#The functions included getting rid of special characters, alphabetizing, getting rid of the word other, getting rid of spaces, and the final condensing one.
+#However, I realized that if I did things differently, I could skip right to the final step, as I would be setting the format myself and wouldn't have to worry about how many spaces, whether its alphabetized, etc..
+#So, this function rolls all the comorb cleaning into one.
+#Series of ifelse statements, with the truth values at the current line in comment form next to its line
+#lot of special care had to be taken with commas and paratheses
+#Note that the portion before the break and after the break are the same, 
+#except that Asthma is now false so none of its resulting strings have asthma in them
+#(and the first line is missing, of course.)
 fixcomorb<-function(x){
-  ifelse(grepl("Asthma",x,fixed=TRUE),
-         ifelse("ypertension",x,fixed=TRUE),
-         )
   
-  
+ifelse(grepl("Asthma",x,fixed=TRUE),
+       
+ifelse(grepl("ypertension",x,fixed=TRUE),  #a t
+ifelse(grepl("pulmonary",x,fixed=TRUE), #a t h t
+ifelse(grepl("Diabetes",x,fixed=TRUE), #a t h t p t
+  "Asthma, Chronic cardiac disease, Chronic pulmonary disease, Diabetes", #a t h t p t d t
+    "Asthma, Chronic cardiac disease, Chronic pulmonary disease"), #a t h t p t d f
+ifelse(grepl("Diabetes",x,fixed=TRUE), #a t h t p f
+  "Asthma, Chronic cardiac disease, Diabetes", #a t h t p f d t
+    "Asthma, Chronic cardiac disease")),#a t h t p f d f
+ifelse(grepl("pulmonary",x,fixed=TRUE),# a t h f  
+ifelse(grepl("Diabetes",x,fixed=TRUE),#a t h f p t 
+  "Asthma, Chronic pulmonary disease, Diabetes",  #a t h f p t d t
+    "Asthma, Chronic pulmonary disease"),  #a t h f p t d f
+ifelse(grepl("Diabetes",x,fixed=TRUE), #a t h f p f 
+  "Asthma, Diabetes", #a t h f p f d t
+    "Asthma"))),  #a t h f p f d f
+
+#FROM HERE ON, ASTHMA FALSE
+
+ifelse(grepl("ypertension",x,fixed=TRUE), #a f
+ifelse(grepl("pulmonary",x,fixed=TRUE),# a f h t
+ifelse(grepl("Diabetes",x,fixed=TRUE), # a f h t p t
+  "Chronic cardiac disease, Chronic pulmonary disease, Diabetes",#a f h t p t d t
+    "Chronic cardiac disease, chronic pulmonary disease"), # a f h t p t d f
+ifelse(grepl("Diabetes",x,fixed=TRUE),   #a f h t p f 
+  "Chronic cardiac disease, Diabetes",  #a f h t p f d t
+    "Chronic cardiac disease")), #a f h t p f d f
+ifelse(grepl("pulmonary",x,fixed=TRUE),#a f h f              
+ifelse(grepl("Diabetes",x,fixed=TRUE),#a f h f p t 
+  "Chronic pulmonary disease, Diabetes",#a f h f p t d t
+    "Chronic pulmonary disease"), #a f h f p t d f
+ifelse(grepl("Diabetes",x,fixed=TRUE),# a f h f p f 
+  "Diabetes",# a f h f p f d t
+    NA)))) # a f h f p f d f
+
 }
+#Testing
+dfex<-df
+a<-sample(df$comorb,25)
+a
+fixcomorb(a)
+#Seems to work!
+
+df$comorb<-fixcomorb(df$comorb)
+
+df %>% group_by(comorb) %>%
+  count()
+#Checked against results from original project, and is perfect!
+#Very happy : )
+
+#Only thing left to do is fix d_dimer and then graph
