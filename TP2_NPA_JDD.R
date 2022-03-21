@@ -204,3 +204,8 @@ ggplot(df, aes(heart_rate, fill = comorb, colour = comorb)) +
 ggplot(df, aes(x=reason, fill=comorb))+
   geom_bar(width = 1)+
   coord_polar("x")
+
+#Pairplot
+#Test<- na.omit(df)
+#Test
+#pairs(Test)
