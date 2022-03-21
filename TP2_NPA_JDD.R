@@ -156,3 +156,45 @@ df %>% group_by(comorb) %>%
 #Very happy : )
 
 #Only thing left to do is fix d_dimer and then graph
+#Now don't know what the true values for <270 and 
+#>4000 were before they were written as that. 
+#Going to set those values to 269 and 4001 respectively, 
+#to be conservative but not throw out the values entirely.
+
+fixd_dimer<-function(x){
+  if (typeof(x)=='str'){
+    if (x=='<270')
+      return('269')
+    if(x=='>4000')
+      return('4001') }
+  else
+    return(x)
+}
+c<-sample(df$d_dimer,25)
+c
+fixd_dimer(c)
+fixddimer2<-function(x){
+  if (typeof(x)=='str')
+    return(x>'0',fixed=TRUE)
+  else
+    return(x) 
+}
+b<-sample(df$d_dimer,25)
+b
+fixddimer2(b)
+
+#plotting
+library(ggplot2)
+
+ggplot(df, aes(heart_rate, fill=reason)) + geom_bar() + labs(x= "Heart Rate")
++ ggtitle("Heart rate by reason for admission") + coord_flip()
+
+
+ggplot(df, aes(comorb,oxygen_sat)) +
+  geom_point(stat='identity',color='darkgreen') + labs(x = "Known Illness ", y = "Oxygen Sat Lvl") +
+  ggtitle("Oxygen Intake with known illness") + coord_flip()
+
+ggplot(df, aes(x=reason, fill=comorb))+
+  geom_bar(width = 1)+
+  coord_polar("x")
+
