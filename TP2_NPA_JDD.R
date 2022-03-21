@@ -186,15 +186,21 @@ fixddimer2(b)
 #plotting
 library(ggplot2)
 
+#Bar Chart
 ggplot(df, aes(heart_rate, fill=reason)) + geom_bar() + labs(x= "Heart Rate")
 + ggtitle("Heart rate by reason for admission") + coord_flip()
 
-
+#Scatter Plot
 ggplot(df, aes(comorb,oxygen_sat)) +
   geom_point(stat='identity',color='darkgreen') + labs(x = "Known Illness ", y = "Oxygen Sat Lvl") +
   ggtitle("Oxygen Intake with known illness") + coord_flip()
 
+#Density Plot
+ggplot(df, aes(heart_rate, fill = comorb, colour = comorb)) +
+  geom_density(alpha = 0.5) +
+  xlim(55, 70)
+
+#PieChart
 ggplot(df, aes(x=reason, fill=comorb))+
   geom_bar(width = 1)+
   coord_polar("x")
-
